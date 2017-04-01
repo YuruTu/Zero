@@ -19,6 +19,9 @@ public:
 	bool Run();
 	static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+	void beginSence();
+	void endSence();
+
 public:
 	std::string WindowName;
 	int WindowWidth, WindowHeight;
@@ -27,6 +30,7 @@ public:
 	HWND      hWnd;
 	CImage    *pImage;
 
+	UINT cBackground;
 };
 
 #endif // !__CWINDOW_H__

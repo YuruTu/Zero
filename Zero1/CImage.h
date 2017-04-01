@@ -12,7 +12,7 @@ class CImage
 {
 public:
 	bool CreateImage(CWindow& window);
-	inline void SetPixel(int x, int y, UINT color);
+	void SetPixel(int x, int y, UINT color);
 
 	int bitCount;
 	int width, height, pitch,size;

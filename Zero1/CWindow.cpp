@@ -103,3 +103,21 @@ LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 	return 0;
 }
+
+void CWindow::beginScence()
+{
+	for(int y=0; y < WindowHeight; ++y)
+	{
+		UINT cc = (WindowHeight - 1 - y) * 230 / (WindowHeight - 1);
+		cc = (cc << 16) | (cc << 8) | (cc);
+		for (int x = 0; x < WindowWidth; ++x)
+			pImage->SetPixel(x, y, cc);
+	}
+}
+
+void CWindow::endScence()
+{
+	HDC hDC = GetDC(hWnd);
+	BitBlt(hDC, 0, 0, WindowWidth, WindowHeight, pImage->screenDC, 0, 0, SRCCOPY);
+	ReleaseDC(hWnd, hDC);
+}

@@ -11,9 +11,8 @@ int main()
 
 	while (wnd.Run())
 	{
-		HDC hDC = GetDC(wnd.hWnd);
-		BitBlt(hDC, 0, 0, wnd.WindowWidth, wnd.WindowHeight, wnd.pImage->screenDC, 0, 0, SRCCOPY);
-		ReleaseDC(wnd.hWnd, hDC);
+		wnd.beginSence();
+		wnd.endSence();
 	}
 
 	return 0;

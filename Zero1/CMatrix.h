@@ -18,9 +18,9 @@ public:
 		}
 	}
 	CMatrix(float f00, float f01, float f02, float f03,
-		float f10, float f11, float f12, float f13,
-		float f20, float f21, float f22, float f23,
-		float f30, float f31, float f32, float f33)
+			float f10, float f11, float f12, float f13,
+			float f20, float f21, float f22, float f23,
+			float f30, float f31, float f32, float f33)
 	{
 		m[0][0] = f00; m[0][1] = f01; m[0][2] = f02; m[0][3] = f03;
 		m[1][0] = f10; m[1][1] = f11; m[1][2] = f12; m[1][3] = f13;
