@@ -21,6 +21,15 @@
     <ClInclude Include="CImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CVector.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CMatrix.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CDevice.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CWindow.cpp">
@@ -30,6 +39,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

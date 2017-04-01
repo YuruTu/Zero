@@ -12,6 +12,7 @@ class CImage
 {
 public:
 	bool CreateImage(CWindow& window);
+	inline void SetPixel(int x, int y, UINT color);
 
 	int bitCount;
 	int width, height, pitch,size;
@@ -19,7 +20,7 @@ public:
 	HBITMAP screenHB,oldHB;
 	void *memory;
 
-	unsigned char *frameBuffer;
+	UINT *frameBuffer;
 };
 
 #endif

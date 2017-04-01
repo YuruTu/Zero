@@ -12,7 +12,7 @@ bool CImage::CreateImage(CWindow & window)
 	BITMAPINFOHEADER &header = bi.bmiHeader;
 	header.biSize = sizeof(BITMAPINFOHEADER);
 	header.biWidth = width;
-	header.biHeight = height;
+	header.biHeight = -height;
 	header.biPlanes = 1;
 	header.biBitCount = bitCount;
 	header.biCompression = BI_RGB;
@@ -34,8 +34,17 @@ bool CImage::CreateImage(CWindow & window)
 	}
 
 	oldHB = (HBITMAP)SelectObject(screenDC, screenHB);
-	frameBuffer = (unsigned char*)memory;
+	frameBuffer = (UINT*)memory;
 	pitch = width * 4;
 
+	memset(frameBuffer, 255, pitch*200);
+
 	return true;
+}
+
+inline void CImage::SetPixel(int x, int y, UINT color)
+{
+	if (x < 0 || x >= width || y < 0 || y >= height)
+		return;
+	frameBuffer[y*width + x] = color;
 }
