@@ -6,13 +6,30 @@
 #include <Windows.h>
 #include "CWindow.h"
 
+template <typename T>
+void swap(T &a, T&b)
+{
+	T tmp(a);
+	a = b;
+	b = tmp;
+}
+
 class CWindow;
 
 class CImage
 {
 public:
 	bool CreateImage(CWindow& window);
-	void SetPixel(int x, int y, UINT color);
+	inline void CImage::SetPixel(int x, int y, UINT color)
+	{
+		if (x < 0 || x >= width || y < 0 || y >= height)
+			return;
+		frameBuffer[y*width + x] = color;
+	}
+	void DrawLine(int x0, int y0, int x1, int y2, UINT color);
+	void DrawRectangle(int x0, int y0, int x1, int y1, UINT color);
+
+	void CopyToDC(HDC hDC, int x, int y, int w, int h);
 
 	int bitCount;
 	int width, height, pitch,size;

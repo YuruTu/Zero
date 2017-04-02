@@ -46,7 +46,9 @@ Network Trash Folder
 Temporary Items
 .apdisk
 /Debug
-/.vs
 */Debug
+/Release
+*/Release
+/.vs
 *.db
 *.opendb

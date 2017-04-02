@@ -1,9 +1,10 @@
 #include "CWindow.h"
 
-bool CWindow::CreateCWindow(int width, int height, std::wstring lpName)
+bool CWindow::CreateCWindow(int width, int height, std::wstring title)
 {
 	HINSTANCE hInst = GetModuleHandle(NULL);
 	HRESULT retsult = S_OK;
+	WindowName = title;
 
 	// 创建窗口类
 	WNDCLASSEX wndclass;
@@ -29,7 +30,7 @@ bool CWindow::CreateCWindow(int width, int height, std::wstring lpName)
 
 	// 创建窗口
 
-	HWND hWnd = CreateWindow(CWINDOW_CLASS_NAME, lpName.c_str(),
+	HWND hWnd = CreateWindow(CWINDOW_CLASS_NAME, title.c_str(),
 		WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
 		0, 0, 0, 0, NULL, NULL, hInst, NULL);
 
@@ -90,6 +91,15 @@ bool CWindow::Run()
 	return true;
 }
 
+void CWindow::LockFPS(int &fps, int maxfps)
+{
+	if (fps > maxfps)
+	{
+		fps--;
+		Sleep(1);
+	}
+}
+
 LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -104,20 +114,114 @@ LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-void CWindow::beginScence()
+
+
+void CWindow::beginScence(bool clear /*= true*/)
 {
-	for(int y=0; y < WindowHeight; ++y)
-	{
-		UINT cc = (WindowHeight - 1 - y) * 230 / (WindowHeight - 1);
-		cc = (cc << 16) | (cc << 8) | (cc);
-		for (int x = 0; x < WindowWidth; ++x)
-			pImage->SetPixel(x, y, cc);
-	}
+	if (!clear)
+		return;
+	memset(pImage->memory, 0, pImage->width * pImage->height * pImage->bitCount / 8);
 }
 
 void CWindow::endScence()
 {
 	HDC hDC = GetDC(hWnd);
-	BitBlt(hDC, 0, 0, WindowWidth, WindowHeight, pImage->screenDC, 0, 0, SRCCOPY);
+	pImage->CopyToDC(hDC, 0, 0, WindowWidth, WindowHeight);
+	//BitBlt(hDC, 0, 0, WindowWidth, WindowHeight, pImage->screenDC, 0, 0, SRCCOPY);
 	ReleaseDC(hWnd, hDC);
 }
+
+//#define DB_MODE_SINGLE   0
+//#define DB_MODE_GRADIENT 1
+
+void CWindow::DrawBackground(int mode /*= DB_MODE_SINGLE*/, UINT color /*= 0*/)
+{
+	int y;
+	UINT cc;
+	for (y = 0; y < WindowHeight; ++y)
+	{
+		if (mode == 1)
+		{
+			cc = (WindowHeight - 1 - y) * 230 / (WindowHeight - 1);
+			cc = (cc << 16) | (cc << 8) | (cc);
+		}
+		else
+			cc = color;
+
+		UINT *dst = pImage->frameBuffer + (y * pImage->width);
+
+		// 方法1 汇编填充，以行为单位  2500 fps
+		// Release 下， 基本不变，还是 2500 fps
+		MemSetQuad(dst, cc, WindowWidth);
+
+		// 方法2, 循环填充，移动指针   500 fps
+		// Release 下， 2300-2500 fps
+		/*for (int x = WindowWidth; x > 0; dst++, x--)
+		dst[0] = cc;*/
+
+		// 方法3 循环调用函数填充      60 fps
+		// 使用内联函数, 在 Release下 可达到 800-900fps
+		/*for (int x = 0; x < WindowWidth; ++x)
+		{
+		pImage->SetPixel(x,y,cc);
+		}*/
+	}
+}
+
+void CWindow::TestScence1(bool clear)
+{
+	static bool first = true;
+	beginScence(clear);
+	if (clear)
+		DrawBackground(DB_MODE_SINGLE, 0);
+	else
+	{
+		if (first)
+		{
+			DrawBackground(DB_MODE_GRADIENT);
+			first = false;
+		}
+	}
+
+	for(int x=0; x < 10; ++x)
+		pImage->SetPixel(rand() % pImage->width, rand() % pImage->height, (rand() % 255) << 16 | (rand()%255)<<8 | rand()%255);
+
+	endScence();
+}
+
+void CWindow::TestScence2(bool clear)
+{
+	static bool first = true;
+	beginScence(clear);
+	if (clear)
+		DrawBackground(DB_MODE_SINGLE, 0);
+	else
+	{
+		if (first)
+		{
+			DrawBackground(DB_MODE_GRADIENT);
+			first = false;
+		}
+	}
+
+	for (int x = 0; x < 100; ++x)
+		pImage->DrawLine(rand() % pImage->width, rand() % pImage->height,
+				         rand() % pImage->width, rand() % pImage->height,
+			            (rand() % 255) << 16 | (rand() % 255) << 8 | rand() % 255);
+
+
+	endScence();
+}
+
+void CWindow::TestScence3()
+{
+	beginScence(SCENCE_NO_CLEAR);
+
+	for (int x = 0; x < 1; ++x)
+		pImage->DrawRectangle(rand() % pImage->width, rand() % pImage->height,
+			rand() % pImage->width, rand() % pImage->height,
+			(rand() % 255) << 16 | (rand() % 255) << 8 | rand() % 255);
+
+	endScence();
+}
+

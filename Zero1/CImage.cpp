@@ -42,9 +42,100 @@ bool CImage::CreateImage(CWindow & window)
 	return true;
 }
 
-void CImage::SetPixel(int x, int y, UINT color)
+/*
+inline void CImage::SetPixel(int x, int y, UINT color)
 {
 	if (x < 0 || x >= width || y < 0 || y >= height)
 		return;
 	frameBuffer[y*width + x] = color;
+}
+*/
+void CImage::DrawLine(int x0, int y0, int x1, int y1, UINT color)
+{
+	int x,y, step, rem = 0;
+	if (x0 == x1 && y0 == y1)
+	{
+		SetPixel(x0, y0, color);
+	}
+	else if (x0 == x1)
+	{
+		int step = y1 > y0 ? 1 : -1;
+		for (y = y0; y != y1; y += step)
+			SetPixel(x0, y, color);
+	}
+	else if (y0 == y1)
+	{
+		int step = x1 > x0 ? 1 : -1;
+		for (x = x0; x != x1; x += step)
+			SetPixel(x, y0, color);
+	}
+	else
+	{
+		int dx = (x0 < x1) ? x1 - x0 : x0 - x1;
+		int dy = (y0 < y1) ? y1 - y0 : y0 - y1;
+		if (dx >= dy)
+		{
+			if (x1 < x0)
+			{
+				swap(x0, x1);
+				swap(y0, y1);
+			}
+			for (x = x0, y = y0; x <= x1; x++)
+			{
+				SetPixel(x, y, color);
+				rem += dy;
+				if (rem >= dx)
+				{
+					rem -= dx;
+					y += (y1 >= y0) ? 1 : -1;
+					SetPixel(x, y, color);
+				}
+			}
+			SetPixel(x1, y1, color);
+		}
+		else
+		{
+			if (y1 < y0)
+			{
+				swap(x0, x1);
+				swap(y0, y1);
+			}
+			for (x = x0, y = y0; y <= y1; ++y)
+			{
+				SetPixel(x, y, color);
+				rem += dx;
+				if (rem >= dy)
+				{
+					rem -= dy;
+					x += (x1 >= x0) ? 1 : -1;
+					SetPixel(x, y, color);
+				}
+			}
+			SetPixel(x1, y1, color);
+		}
+	}
+}
+
+void CImage::DrawRectangle(int x0, int y0, int x1, int y1, UINT color)
+{
+	int x, y;
+	x = min(x0, x1);
+	y = min(y0, y1);
+	x1 = max(x0, x1);
+	y1 = max(y0, y1);
+
+	/*for (; y <= y1; ++y)
+		for (x0 = x; x0 <= x1; ++x0)
+			SetPixel(x0, y, color);*/
+
+	for (; y <= y1; ++y)
+	{
+		UINT *dst = frameBuffer + y * width + x;
+		MemSetQuad(dst, color, x1 - x);
+	}
+}
+
+void CImage::CopyToDC(HDC hDC, int x, int y, int w, int h)
+{
+	BitBlt(hDC, x, y, w, h, screenDC, 0, 0, SRCCOPY);
 }
