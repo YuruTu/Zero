@@ -3,7 +3,7 @@
 #ifndef __CWINDOW_H__
 #define __CWINDOW_H__
 
-#include <Windows.h>
+#include <windows.h>
 #include <string>
 #include "CImage.h"
 
@@ -36,6 +36,8 @@ public:
 	void TestScence1(bool clear = SCENCE_NO_CLEAR);  // point
 	void TestScence2(bool clear = SCENCE_NO_CLEAR);  // line
 	void TestScence3();							     // triangle
+	void TestScence4();
+	void TestScence5();
 
 public:
 	std::wstring WindowName;
