@@ -88,12 +88,17 @@ public:
 	// 设置相机变换
 	void set_lookat(const CVector &eye, const CVector &at, const CVector &up);
 
-	void matrix_set_perspective(float fovy, float aspect, float zn, float zf)
+	// 龙书 DX11   5.6.3.5 小节
+	// 经过此变换后，顶点位于NDC 空间，
+	//  -1 <= x <= 1
+	//  -1 <= y <= 1
+	//   0 <= z <= 1
+	void matrix_set_perspective(float fovy, float aspectratio, float zn, float zf)
 	{
 		float fax = 1.0f / (float)tan(fovy * 0.5f);
 		set_zero();
 
-		m[0][0] = (fax / aspect);
+		m[0][0] = (fax / aspectratio);
 		m[1][1] = fax;
 		m[2][2] = zf / (zf - zn);
 		m[3][2] = -zf * zf / (zf - zn);

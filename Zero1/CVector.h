@@ -53,6 +53,13 @@ public:
 	{
 		return n * (dotProduct(n) / n.lengthSQ());
 	}
+	void set(float x, float y, float z, float w)
+	{
+		this->x = x;
+		this->y = y;
+		this->z = z;
+		this->w = w;
+	}
 
 	CVector operator-()
 	{

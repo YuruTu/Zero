@@ -47,7 +47,6 @@ public:
 	HWND      hWnd;
 	CImage    *pImage;
 
-	UINT cBackground;
 };
 
 inline void MemSetQuad(void *dest, UINT data, int count)

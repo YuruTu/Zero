@@ -135,7 +135,9 @@ void CImage::DrawRectangle(int x0, int y0, int x1, int y1, UINT color)
 	}
 }
 
+/*
 void CImage::CopyToDC(HDC hDC, int x, int y, int w, int h)
 {
 	BitBlt(hDC, x, y, w, h, screenDC, 0, 0, SRCCOPY);
 }
+*/

@@ -29,7 +29,10 @@ public:
 	void DrawLine(int x0, int y0, int x1, int y2, UINT color);
 	void DrawRectangle(int x0, int y0, int x1, int y1, UINT color);
 
-	void CopyToDC(HDC hDC, int x, int y, int w, int h);
+	inline void CopyToDC(HDC hDC, int x, int y, int w, int h)
+	{
+		BitBlt(hDC, x, y, w, h, screenDC, 0, 0, SRCCOPY);
+	}
 
 	int bitCount;
 	int width, height, pitch,size;

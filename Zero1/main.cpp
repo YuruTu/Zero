@@ -23,7 +23,7 @@ int main()
 	CImage *pImage = wnd.pImage;
 	wnd.DrawBackground(DB_MODE_GRADIENT);
 	
-	CMatrix s, r, r1, t, w;
+	CMatrix s, r, t, w;
 	s.set_scale(1, 1, 1);
 	r.set_identity();
 	r.m[1][1] = -1;
