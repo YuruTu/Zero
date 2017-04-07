@@ -93,7 +93,7 @@ public:
 	//  -1 <= x <= 1
 	//  -1 <= y <= 1
 	//   0 <= z <= 1
-	void matrix_set_perspective(float fovy, float aspectratio, float zn, float zf)
+	void set_perspective(float fovy, float aspectratio, float zn, float zf)
 	{
 		float fax = 1.0f / (float)tan(fovy * 0.5f);
 		set_zero();
@@ -101,7 +101,7 @@ public:
 		m[0][0] = (fax / aspectratio);
 		m[1][1] = fax;
 		m[2][2] = zf / (zf - zn);
-		m[3][2] = -zf * zf / (zf - zn);
+		m[3][2] = -zf * zn / (zf - zn);
 		m[2][3] = 1;
 	}
 

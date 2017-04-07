@@ -27,7 +27,10 @@
     <ClInclude Include="CMatrix.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CDevice.h">
+    <ClInclude Include="CVertex.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CTransform.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,5 +53,13 @@
     <ClCompile Include="CVector.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="CVertex.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="README.MD">
+      <Filter>资源文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

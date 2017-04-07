@@ -6,6 +6,7 @@
 #include <windows.h>
 #include <string>
 #include "CImage.h"
+#include "CTransform.h"
 
 #define CWINDOW_CLASS_NAME TEXT("ZERO_WINDOW")
 
@@ -38,15 +39,18 @@ public:
 	void TestScence3();							     // triangle
 	void TestScence4();
 	void TestScence5();
+	void TestBox();
 
 public:
-	std::wstring WindowName;
-	int WindowWidth, WindowHeight;
+	std::wstring windowName;
+	int windowWidth, windowHeight;
 
 	HINSTANCE hInstance;
 	HWND      hWnd;
 	CImage    *pImage;
-
+	CTransform transform;
+	CMatrix    screen;
+	bool    backfaceCull;
 };
 
 inline void MemSetQuad(void *dest, UINT data, int count)

@@ -61,13 +61,21 @@ public:
 		this->w = w;
 	}
 
-	CVector operator-()
-	{
-		return CVector(-x, -y, -z);
-	}
 	void operator=(const CVector &oth)
 	{
 		x = oth.x, y = oth.y, z = oth.z, w = oth.w;
+	}
+	void operator*=(float T)
+	{
+		x *= T;
+		y *= T;
+		z *= T;
+	}
+	void operator*=(CMatrix &oth);
+
+	CVector operator-()
+	{
+		return CVector(-x, -y, -z);
 	}
 	CVector operator+(const CVector &oth) const
 	{

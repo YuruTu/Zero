@@ -2,9 +2,10 @@
 
 bool CImage::CreateImage(CWindow & window)
 {
+	this->window = &window;
 	bitCount = 32;
-	width = window.WindowWidth;
-	height = window.WindowHeight;
+	width = window.windowWidth;
+	height = window.windowHeight;
 	size = width * height * 4;
 
 	BITMAPINFO bi;
@@ -133,6 +134,80 @@ void CImage::DrawRectangle(int x0, int y0, int x1, int y1, UINT color)
 		UINT *dst = frameBuffer + y * width + x;
 		MemSetQuad(dst, color, x1 - x);
 	}
+}
+
+CVector p0,p1, p2;
+void CImage::DrawPrimitive(CVertex &v0, CVertex &v1, CVertex &v2)
+{
+	// No.1   Vertex stage
+	// 1. local  -> global
+	// 2. global -> camera
+	// 3. camera -> CVV(NOD?) 
+	// 4. cliping             剪裁
+	// 5. backface culling    背面消除
+
+
+	CTransform &trans = window->transform;
+	// 1.2.
+	p0 = v0.v * trans.getWorld();
+	p1 = v1.v * trans.getWorld();
+	p2 = v2.v * trans.getWorld();
+	p0 *= trans.getView();
+	p1 *= trans.getView();
+	p2 *= trans.getView();
+
+	// 5.
+	if (window->backfaceCull)
+	{
+		CVector look = p0; // 三角形上的任意一个点，都可以作为视线点
+		CVector t1 = p1 - p0, t2 = p2 - p0;
+		CVector n = t1.crossProduct(t2);
+		n.normalize();
+		float lookn = look.dotProduct(n);
+
+		if (lookn >= 0.0f)
+			return;
+	}
+
+	p0 *= trans.getProj();
+	p1 *= trans.getProj();
+	p2 *= trans.getProj();
+
+	//4.
+	// 有一个点不在CVV内，就不画了。233
+	if (trans.check_cvv(p0) != 0) return;
+	if (trans.check_cvv(p1) != 0) return;
+	if (trans.check_cvv(p2) != 0) return;
+
+	// 归一化，但并不移动到屏幕坐标
+	trans.homogenize(p0);
+	trans.homogenize(p1);
+	trans.homogenize(p2);
+
+	// 转换为屏幕坐标
+	/*CMatrix &screen = window->screen;
+	p0 *= screen;
+	p1 *= screen;
+	p2 *= screen;*/
+
+	float r = 1.0f;//1.0*window->WindowWidth / window->WindowHeight;
+	int w = window->windowWidth;
+	int h = window->windowHeight;
+	p0.x = w*(p0.x + 1) / 2 + 0;
+	p0.y = h*(1 - p0.y) / 2;
+	p1.x = w*(p1.x + r) / (2 * r) + 0;
+	p1.y = h*(1 - p1.y) / 2;
+	p2.x = w*(p2.x + r) / (2 * r) + 0;
+	p2.y = h*(1 - p2.y) / 2;
+
+	// No.2   Pixel stage
+	
+
+	// wireframe
+	DrawLine(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
+	DrawLine(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
+	DrawLine(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+
 }
 
 /*

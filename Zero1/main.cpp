@@ -24,46 +24,27 @@ int main()
 	wnd.DrawBackground(DB_MODE_GRADIENT);
 	
 	CMatrix s, r, t, w;
-	s.set_scale(1, 1, 1);
+	s.set_scale(10, 10, 10);
 	r.set_identity();
 	r.m[1][1] = -1;
-	t.set_translate(1.0 * wnd.WindowWidth / 2, 1.0 * wnd.WindowHeight / 2, 0);
+	t.set_translate(static_cast<float>(1.0 * wnd.windowWidth / 2), float(1.0 * wnd.windowHeight / 2), 0.0f);
 
 	w = s * r;
 	w = w * t;
 
-	float theta = 0;
-	CVector v;
-	v.w = 1;
+	wnd.screen = w;
+
+	wnd.transform.getWorld().set_identity();
+	wnd.transform.getView().set_lookat(CVector(10, 0, 0,1), CVector(0,0,0,1), CVector(0, 0, 1));
+	wnd.transform.getProj().set_perspective(3.1415926f*0.5,
+		float(wnd.windowWidth) / float(wnd.windowHeight),
+		1.0, 500.0f);
+
 	while (wnd.Run())
 	{
-		
-		/*wnd.beginScence();
-		wnd.DrawBackground(DB_MODE_GRADIENT);
-
-		float x, y;
-		x = -wnd.WindowWidth / 2;
-
-		theta += 0.001;
-		for (; x <= wnd.WindowWidth / 2; ++x)
-		{
-			y = 100 * cos((x - wnd.WindowWidth / 2.0)/ wnd.WindowWidth * 3.1415926 * 3.5 + theta);
-
-			v.x = x;
-			v.y = y;
-			
-			v = v * w;
-			pImage->SetPixel(v.x, v.y-2,  (int(v.x) << 8) | int(v.y));
-			pImage->SetPixel(v.x, v.y-1,  (int(v.x) << 8) | int(v.y));
-			pImage->SetPixel(v.x, v.y, (int(v.x)<<8) | int(v.y));
-			pImage->SetPixel(v.x, v.y+1, (int(v.x) << 8) | int(v.y));
-			pImage->SetPixel(v.x, v.y+2, (int(v.x) << 8) | int(v.y));
-		}
-
-		wnd.endScence();*/
 
 		//wnd.TestScence4();
-		wnd.TestScence5();
+		wnd.TestBox();
 		
 		++fps;
 		QueryPerformanceCounter(&now);
@@ -71,7 +52,7 @@ int main()
 		if (past >= 1)
 		{
 			last = now;
-			swprintf(Title, L"%s fps: %d", wnd.WindowName.c_str(), fps);
+			swprintf(Title, L"%s fps: %d", wnd.windowName.c_str(), fps);
 			SetWindowText(wnd.hWnd, Title);
 			fps = 0;
 		}
