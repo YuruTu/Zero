@@ -40,6 +40,8 @@ int main()
 		float(wnd.windowWidth) / float(wnd.windowHeight),
 		1.0, 500.0f);
 
+	pImage->tmpLine = 1;
+
 	while (wnd.Run())
 	{
 

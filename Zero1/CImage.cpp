@@ -117,6 +117,59 @@ void CImage::DrawLine(int x0, int y0, int x1, int y1, UINT color)
 	}
 }
 
+void CImage::DrawLineEx(int x0, int y0, int x1, int y1, UINT color)
+{
+	int dx = x1 - x0;
+	int dy = y1 - y0;
+
+	int c;
+	int m;
+	int d = 0;
+	int run;
+
+	int xInc = 4;
+	int yInc = pitch;
+
+	if (dx < 0)
+	{
+		xInc = -xInc;
+		dx = -dx;
+	}
+
+	if (dy < 0)
+	{
+		yInc = -yInc;
+		dy = -dy;
+	}
+
+	UINT *dst;
+	dst = (UINT*)((UCHAR*)memory + (y0 * pitch) + (x0 << 2));
+
+	if (dy > dx)
+	{
+		swap(dx, dy);
+		swap(xInc, yInc);
+	}
+
+	c = dx << 1;
+	m = dy << 1;
+
+	run = dx;
+	do
+	{
+		*dst = color;
+
+		dst = (UINT*)((UCHAR*)dst + xInc);	// x += xInc
+		d += m;
+		if (d > dx)
+		{
+			dst = (UINT*)((UCHAR*)dst + yInc);	// y += yInc
+			d -= c;
+		}
+		run -= 1;
+	} while (run >= 0);
+}
+
 void CImage::DrawRectangle(int x0, int y0, int x1, int y1, UINT color)
 {
 	int x, y;
@@ -203,10 +256,19 @@ void CImage::DrawPrimitive(CVertex &v0, CVertex &v1, CVertex &v2)
 	// No.2   Pixel stage
 	
 
-	// wireframe
-	DrawLine(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
-	DrawLine(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
-	DrawLine(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+	if (tmpLine == 1)
+	{
+		// wireframe
+		DrawLine(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
+		DrawLine(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
+		DrawLine(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+	}
+	else if (tmpLine == 2)
+	{
+		DrawLineEx(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
+		DrawLineEx(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
+		DrawLineEx(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+	}
 
 }
 

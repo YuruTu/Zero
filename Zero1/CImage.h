@@ -28,7 +28,8 @@ public:
 			return;
 		frameBuffer[y*width + x] = color;
 	}
-	void DrawLine(int x0, int y0, int x1, int y2, UINT color);
+	void DrawLine(int x0, int y0, int x1, int y1, UINT color);
+	void DrawLineEx(int x0, int y0, int x1, int y1, UINT color);
 	void DrawRectangle(int x0, int y0, int x1, int y1, UINT color);
 	void DrawPrimitive(CVertex &v0, CVertex &v1, CVertex &v2);
 
@@ -45,6 +46,8 @@ public:
 
 	CWindow *window;
 	UINT *frameBuffer;
+
+	UINT tmpLine;
 };
 
 #endif

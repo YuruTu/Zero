@@ -354,7 +354,7 @@ void CWindow::TestBox()
 	if (boxfirst)
 	{
 		transform.getWorld().set_identity();
-		transform.getView().set_lookat(CVector(10, 0, 0, 1), CVector(0, 0, 0, 1), CVector(0, 0, 1));
+		transform.getView().set_lookat(CVector(40, 0, 0, 1), CVector(0, 0, 0, 1), CVector(0, 0, 1));
 		transform.getProj().set_perspective(3.1415926f*0.5,
 			float(windowWidth) / float(windowHeight),
 			1.0, 500.0f);
@@ -366,7 +366,7 @@ void CWindow::TestBox()
 	static float theta = 0;
 	CMatrix m,t,ww;
 	m.set_rotation(0, 0, 1, theta);
-	theta += 0.001;
+	theta += 0.0005;
 
 	// ÊÇ·ñÏû³ý±³Ãæ
 	backfaceCull = true;
@@ -375,19 +375,37 @@ void CWindow::TestBox()
 	int h = windowHeight;
 	int z, y;
 
-	for (int i = 0; i < 5; ++i)
+	/*
+	for (int i = 0; i < 3; ++i)
 	{
-		z = -5 + i * 3;
-		for (int j = 0; j < 5; ++j)
+		z = -3 + i * 3;
+		if (i > 1)
+			pImage->tmpLine = 2;
+		for (int j = 0; j < 3; ++j)
 		{
-			y = -5 + j * 3;
+			y = -3 + j * 3;
 			t.set_translate(0, y, z);
 			ww = m*t;
 			transform.getWorld() = ww;
 			DrawBox(pImage);
 		}
 	}
+	*/
 
+	pImage->tmpLine = 1;
+	for (int i = 0; i < 20; ++i)
+	{
+		z = -25 + i * 3;
+		
+		for (int j = 0; j < 20; ++j)
+		{
+			y = -25 + j * 3;
+			t.set_translate(0, y, z);
+			ww = m*t;
+			transform.getWorld() = ww;
+			DrawBox(pImage);
+		}
+	}
 	
 
 	endScence();
