@@ -146,9 +146,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CDevice.h" />
     <ClInclude Include="CTransform.h" />
     <ClInclude Include="CImage.h" />
     <ClInclude Include="CMatrix.h" />
+    <ClInclude Include="CTriangle.h" />
     <ClInclude Include="CVector.h" />
     <ClInclude Include="CVertex.h" />
     <ClInclude Include="CWindow.h" />

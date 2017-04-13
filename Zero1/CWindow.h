@@ -18,6 +18,9 @@ class CImage;
 #define DB_MODE_SINGLE   0
 #define DB_MODE_GRADIENT 1
 
+#define RD_STATE_WIREFRAME  1
+#define RD_STATE_COLOR      2
+
 class CWindow
 {
 public:
@@ -27,8 +30,8 @@ public:
 	void LockFPS(int &fps, int maxfps);
 	static LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-	void beginScence(bool clear = SCENCE_CLEAR);
-	void endScence();
+	void BeginScence(bool clear = SCENCE_CLEAR);
+	void EndScence();
 
 	void DrawBackground(int mode = 0, UINT color = 0);
 
@@ -45,12 +48,13 @@ public:
 	std::wstring windowName;
 	int windowWidth, windowHeight;
 
-	HINSTANCE hInstance;
-	HWND      hWnd;
-	CImage    *pImage;
+	HINSTANCE  hInstance;
+	HWND       hWnd;
+	CImage     *pBackBuffer;
 	CTransform transform;
 	CMatrix    screen;
-	bool    backfaceCull;
+	bool	   backfaceCull;
+	UINT       renderState;
 };
 
 inline void MemSetQuad(void *dest, UINT data, int count)

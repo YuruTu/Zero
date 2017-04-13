@@ -9,6 +9,7 @@ bool CWindow::CreateCWindow(int width, int height, std::wstring title)
 	this->windowWidth = width;
 	this->windowHeight = height;
 	backfaceCull = false;
+	renderState = RD_STATE_COLOR;
 
 	// 创建窗口类
 	WNDCLASSEX wndclass;
@@ -66,8 +67,8 @@ bool CWindow::CreateCWindow(int width, int height, std::wstring title)
 	this->hWnd = hWnd;
 	
 	// 创建图像缓存
-	pImage = new CImage();
-	if (!pImage->CreateImage(*this))
+	pBackBuffer = new CImage();
+	if (!pBackBuffer->CreateImage(*this))
 	{
 		MessageBox(NULL, TEXT("创建图像缓存时失败"), TEXT("错误"), NULL);
 		return false;
@@ -118,17 +119,17 @@ LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 
 
-void CWindow::beginScence(bool clear /*= true*/)
+void CWindow::BeginScence(bool clear /*= true*/)
 {
 	if (!clear)
 		return;
-	memset(pImage->memory, 0, pImage->width * pImage->height * pImage->bitCount / 8);
+	memset(pBackBuffer->memory, 0, pBackBuffer->width * pBackBuffer->height * pBackBuffer->bitCount / 8);
 }
 
-void CWindow::endScence()
+void CWindow::EndScence()
 {
 	HDC hDC = GetDC(hWnd);
-	pImage->CopyToDC(hDC, 0, 0, windowWidth, windowHeight);
+	pBackBuffer->CopyToDC(hDC, 0, 0, windowWidth, windowHeight);
 	//BitBlt(hDC, 0, 0, WindowWidth, WindowHeight, pImage->screenDC, 0, 0, SRCCOPY);
 	ReleaseDC(hWnd, hDC);
 }
@@ -150,7 +151,7 @@ void CWindow::DrawBackground(int mode /*= DB_MODE_SINGLE*/, UINT color /*= 0*/)
 		else
 			cc = color;
 
-		UINT *dst = pImage->frameBuffer + (y * pImage->width);
+		UINT *dst = pBackBuffer->frameBuffer + (y * pBackBuffer->width);
 
 		// 方法1 汇编填充，以行为单位  2500 fps
 		// Release 下， 基本不变，还是 2500 fps
@@ -173,7 +174,7 @@ void CWindow::DrawBackground(int mode /*= DB_MODE_SINGLE*/, UINT color /*= 0*/)
 void CWindow::TestScence1(bool clear)
 {
 	static bool first = true;
-	beginScence(clear);
+	BeginScence(clear);
 	if (clear)
 		DrawBackground(DB_MODE_SINGLE, 0);
 	else
@@ -186,15 +187,15 @@ void CWindow::TestScence1(bool clear)
 	}
 
 	for(int x=0; x < 10; ++x)
-		pImage->SetPixel(rand() % pImage->width, rand() % pImage->height, (rand() % 255) << 16 | (rand()%255)<<8 | rand()%255);
+		pBackBuffer->DrawPixel(rand() % pBackBuffer->width, rand() % pBackBuffer->height, (rand() % 255) << 16 | (rand()%255)<<8 | rand()%255);
 
-	endScence();
+	EndScence();
 }
 
 void CWindow::TestScence2(bool clear)
 {
 	static bool first = true;
-	beginScence(clear);
+	BeginScence(clear);
 	if (clear)
 		DrawBackground(DB_MODE_SINGLE, 0);
 	else
@@ -207,24 +208,24 @@ void CWindow::TestScence2(bool clear)
 	}
 
 	for (int x = 0; x < 10; ++x)
-		pImage->DrawLine(rand() % pImage->width, rand() % pImage->height,
-				         rand() % pImage->width, rand() % pImage->height,
+		pBackBuffer->DrawLine(rand() % pBackBuffer->width, rand() % pBackBuffer->height,
+				         rand() % pBackBuffer->width, rand() % pBackBuffer->height,
 			            (rand() % 255) << 16 | (rand() % 255) << 8 | rand() % 255);
 
 
-	endScence();
+	EndScence();
 }
 
 void CWindow::TestScence3()
 {
-	beginScence(SCENCE_NO_CLEAR);
+	BeginScence(SCENCE_NO_CLEAR);
 
 	for (int x = 0; x < 10; ++x)
-		pImage->DrawRectangle(rand() % pImage->width, rand() % pImage->height,
-			rand() % pImage->width, rand() % pImage->height,
+		pBackBuffer->DrawRectangle(rand() % pBackBuffer->width, rand() % pBackBuffer->height,
+			rand() % pBackBuffer->width, rand() % pBackBuffer->height,
 			(rand() % 255) << 16 | (rand() % 255) << 8 | rand() % 255);
 
-	endScence();
+	EndScence();
 }
 
 CMatrix s(false), r(false), t(false), w(false);
@@ -232,7 +233,7 @@ bool first4 = true;
 void CWindow::TestScence4()
 {
 	static float theta = 0;
-	beginScence();
+	BeginScence();
 	DrawBackground(DB_MODE_GRADIENT);
 
 	
@@ -266,13 +267,13 @@ void CWindow::TestScence4()
 	}
 
 	for (int i = 0; i < 3; ++i)
-		pImage->DrawLine(v[i].x, v[i].y, v[i + 1].x, v[i + 1].y, 0);
-	pImage->DrawLine(v[0].x, v[0].y, v[3].x, v[3].y, 0);
+		pBackBuffer->DrawLine(v[i].x, v[i].y, v[i + 1].x, v[i + 1].y, 0);
+	pBackBuffer->DrawLine(v[0].x, v[0].y, v[3].x, v[3].y, 0);
 
-	pImage->DrawLine(v[0].x, v[0].y, v[2].x, v[2].y, 0);
-	pImage->DrawLine(v[1].x, v[1].y, v[3].x, v[3].y, 0);
+	pBackBuffer->DrawLine(v[0].x, v[0].y, v[2].x, v[2].y, 0);
+	pBackBuffer->DrawLine(v[1].x, v[1].y, v[3].x, v[3].y, 0);
 
-	endScence();
+	EndScence();
 }
 
 void CWindow::TestScence5()
@@ -290,7 +291,7 @@ void CWindow::TestScence5()
 	CVector v;
 	v.w = 1;
 
-	beginScence();
+	BeginScence();
 	DrawBackground(DB_MODE_GRADIENT);
 
 	float x, y;
@@ -305,29 +306,29 @@ void CWindow::TestScence5()
 		v.y = y;
 
 		v = v * w;
-		pImage->SetPixel(v.x, v.y - 2, (int(v.x) << 8) | int(v.y));
-		pImage->SetPixel(v.x, v.y - 1, (int(v.x) << 8) | int(v.y));
-		pImage->SetPixel(v.x, v.y, (int(v.x) << 8) | int(v.y));
-		pImage->SetPixel(v.x, v.y + 1, (int(v.x) << 8) | int(v.y));
-		pImage->SetPixel(v.x, v.y + 2, (int(v.x) << 8) | int(v.y));
+		pBackBuffer->DrawPixel(v.x, v.y - 2, (int(v.x) << 8) | int(v.y));
+		pBackBuffer->DrawPixel(v.x, v.y - 1, (int(v.x) << 8) | int(v.y));
+		pBackBuffer->DrawPixel(v.x, v.y,     (int(v.x) << 8) | int(v.y));
+		pBackBuffer->DrawPixel(v.x, v.y + 1, (int(v.x) << 8) | int(v.y));
+		pBackBuffer->DrawPixel(v.x, v.y + 2, (int(v.x) << 8) | int(v.y));
 	}
 
 
 
-	endScence();
+	EndScence();
 }
 
 
 CVertex mesh[8] = 
 {
-	{ { 1, -1,  1, 1 }, },
-	{ { -1, -1,  1, 1 },},
-	{ { -1,  1,  1, 1 },},
-	{ { 1,  1,  1, 1 }, },
-	{ { 1, -1, -1, 1 }, },
-	{ { -1, -1, -1, 1 },},
-	{ { -1,  1, -1, 1 },},
-	{ { 1,  1, -1, 1 }, },
+	{ { 1, -1,  1, 1 }, {1,0.2,0.2} }, 
+	{ { -1, -1,  1, 1 },{0.2,1.0,0.2},},
+	{ { -1,  1,  1, 1 },{0.2,0.2,1.0}},
+	{ { 1,  1,  1, 1 }, {1.0,0.2,1.0}},
+	{ { 1, -1, -1, 1 }, {1.0,1.0,0.2}},
+	{ { -1, -1, -1, 1 },{0.2,1.0,1.0}},
+	{ { -1,  1, -1, 1 },{1.0,0.3,0.3}},
+	{ { 1,  1, -1, 1 }, {0.2,1.0,0.3}},
 };
 
 
@@ -354,19 +355,21 @@ void CWindow::TestBox()
 	if (boxfirst)
 	{
 		transform.getWorld().set_identity();
-		transform.getView().set_lookat(CVector(40, 0, 0, 1), CVector(0, 0, 0, 1), CVector(0, 0, 1));
+		transform.getView().set_lookat(CVector(8, 0, 0, 1), CVector(0, 0, 0, 1), CVector(0, 0, 1));
 		transform.getProj().set_perspective(3.1415926f*0.5,
 			float(windowWidth) / float(windowHeight),
 			1.0, 500.0f);
 		boxfirst = false;
 	}
 
-	beginScence();
+	BeginScence();
 	DrawBackground(DB_MODE_GRADIENT);
 	static float theta = 0;
 	CMatrix m,t,ww;
+	theta += 0.001;
+	t.set_rotation(0, -1, 1, 1.5*theta);
 	m.set_rotation(0, 0, 1, theta);
-	theta += 0.0005;
+	m = m*t;
 
 	// 是否消除背面
 	backfaceCull = true;
@@ -374,24 +377,36 @@ void CWindow::TestBox()
 	int w = windowWidth;
 	int h = windowHeight;
 	int z, y;
-
-	/*
+	
 	for (int i = 0; i < 3; ++i)
 	{
 		z = -3 + i * 3;
-		if (i > 1)
-			pImage->tmpLine = 2;
 		for (int j = 0; j < 3; ++j)
 		{
 			y = -3 + j * 3;
 			t.set_translate(0, y, z);
 			ww = m*t;
 			transform.getWorld() = ww;
-			DrawBox(pImage);
+			DrawBox(pBackBuffer);
+		}
+	}
+	
+	/*
+	for (int i = 0; i < 11; ++i)
+	{
+		z = -15 + i * 3;
+		for (int j = 0; j < 11; ++j)
+		{
+			y = -15 + j * 3;
+			t.set_translate(0, y, z);
+			ww = m*t;
+			transform.getWorld() = ww;
+			DrawBox(pBackBuffer);
 		}
 	}
 	*/
 
+	/*
 	pImage->tmpLine = 1;
 	for (int i = 0; i < 20; ++i)
 	{
@@ -406,7 +421,7 @@ void CWindow::TestBox()
 			DrawBox(pImage);
 		}
 	}
-	
+	*/
 
-	endScence();
+	EndScence();
 }

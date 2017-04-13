@@ -9,6 +9,11 @@
 const float EPIROUNDING_ERROR_f32 = 0.000001f;
 
 bool equals(const float &x, const float &y);
+template<typename T>
+T interp(T x0, T x1, float t)
+{
+	return x0 + (x1 - x0)*t;
+}
 
 class CMatrix;
 
@@ -60,6 +65,12 @@ public:
 		this->z = z;
 		this->w = w;
 	}
+	void interp(const CVector &v0, const CVector &v1, float t)
+	{
+		x = ::interp(v0.x, v1.x, t);
+		y = ::interp(v0.y, v1.y, t);
+		z = ::interp(v0.z, v1.z, t);
+	}
 
 	void operator=(const CVector &oth)
 	{
@@ -72,6 +83,13 @@ public:
 		z *= T;
 	}
 	void operator*=(CMatrix &oth);
+	void operator+=(const CVector &oth)
+	{
+		x += oth.x;
+		y += oth.y;
+		z += oth.z;
+		w += oth.w;
+	}
 
 	CVector operator-()
 	{

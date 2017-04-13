@@ -20,7 +20,7 @@ int main()
 	QueryPerformanceCounter(&last);
 	now = last;
 	
-	CImage *pImage = wnd.pImage;
+	CImage *pImage = wnd.pBackBuffer;
 	wnd.DrawBackground(DB_MODE_GRADIENT);
 	
 	CMatrix s, r, t, w;
@@ -40,7 +40,8 @@ int main()
 		float(wnd.windowWidth) / float(wnd.windowHeight),
 		1.0, 500.0f);
 
-	pImage->tmpLine = 1;
+	pImage->LineMode = 1;
+	wnd.renderState = RD_STATE_WIREFRAME | RD_STATE_COLOR;
 
 	while (wnd.Run())
 	{

@@ -1,4 +1,5 @@
 #include "CImage.h"
+#include "CTriangle.h"
 
 bool CImage::CreateImage(CWindow & window)
 {
@@ -53,22 +54,22 @@ inline void CImage::SetPixel(int x, int y, UINT color)
 */
 void CImage::DrawLine(int x0, int y0, int x1, int y1, UINT color)
 {
-	int x,y, step, rem = 0;
+	int x,y, rem = 0;
 	if (x0 == x1 && y0 == y1)
 	{
-		SetPixel(x0, y0, color);
+		DrawPixel(x0, y0, color);
 	}
 	else if (x0 == x1)
 	{
 		int step = y1 > y0 ? 1 : -1;
 		for (y = y0; y != y1; y += step)
-			SetPixel(x0, y, color);
+			DrawPixel(x0, y, color);
 	}
 	else if (y0 == y1)
 	{
 		int step = x1 > x0 ? 1 : -1;
 		for (x = x0; x != x1; x += step)
-			SetPixel(x, y0, color);
+			DrawPixel(x, y0, color);
 	}
 	else
 	{
@@ -83,16 +84,16 @@ void CImage::DrawLine(int x0, int y0, int x1, int y1, UINT color)
 			}
 			for (x = x0, y = y0; x <= x1; x++)
 			{
-				SetPixel(x, y, color);
+				DrawPixel(x, y, color);
 				rem += dy;
 				if (rem >= dx)
 				{
 					rem -= dx;
 					y += (y1 >= y0) ? 1 : -1;
-					SetPixel(x, y, color);
+					DrawPixel(x, y, color);
 				}
 			}
-			SetPixel(x1, y1, color);
+			DrawPixel(x1, y1, color);
 		}
 		else
 		{
@@ -103,16 +104,16 @@ void CImage::DrawLine(int x0, int y0, int x1, int y1, UINT color)
 			}
 			for (x = x0, y = y0; y <= y1; ++y)
 			{
-				SetPixel(x, y, color);
+				DrawPixel(x, y, color);
 				rem += dx;
 				if (rem >= dy)
 				{
 					rem -= dy;
 					x += (x1 >= x0) ? 1 : -1;
-					SetPixel(x, y, color);
+					DrawPixel(x, y, color);
 				}
 			}
-			SetPixel(x1, y1, color);
+			DrawPixel(x1, y1, color);
 		}
 	}
 }
@@ -190,6 +191,7 @@ void CImage::DrawRectangle(int x0, int y0, int x1, int y1, UINT color)
 }
 
 CVector p0,p1, p2;
+CVertex tv0, tv1, tv2;
 void CImage::DrawPrimitive(CVertex &v0, CVertex &v1, CVertex &v2)
 {
 	// No.1   Vertex stage
@@ -243,7 +245,7 @@ void CImage::DrawPrimitive(CVertex &v0, CVertex &v1, CVertex &v2)
 	p1 *= screen;
 	p2 *= screen;*/
 
-	float r = 1.0f;//1.0*window->WindowWidth / window->WindowHeight;
+	float r = 1.0f;
 	int w = window->windowWidth;
 	int h = window->windowHeight;
 	p0.x = w*(p0.x + 1) / 2 + 0;
@@ -255,21 +257,37 @@ void CImage::DrawPrimitive(CVertex &v0, CVertex &v1, CVertex &v2)
 
 	// No.2   Pixel stage
 	
-
-	if (tmpLine == 1)
+	if (window->renderState & RD_STATE_COLOR)
 	{
-		// wireframe
-		DrawLine(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
-		DrawLine(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
-		DrawLine(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+		// 归一化的时候，我没有改 w 值，所以这里直接赋值
+		tv0.v = p0;
+		tv1.v = p1;
+		tv2.v = p2;
+		tv0.color = v0.color;
+		tv1.color = v1.color;
+		tv2.color = v2.color;
+		CTriangle tri[2];
+		int n = GetTriangleList(tv0, tv1, tv2, tri);
+		if (n >= 1) RenderTriangle(this, tri[0]);
+		if (n >= 2) RenderTriangle(this, tri[1]);
 	}
-	else if (tmpLine == 2)
+	
+	if (window->renderState & RD_STATE_WIREFRAME)
 	{
-		DrawLineEx(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
-		DrawLineEx(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
-		DrawLineEx(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+		if (LineMode == 1)
+		{
+			// wireframe
+			DrawLine(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
+			DrawLine(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
+			DrawLine(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+		}
+		else if (LineMode == 2)
+		{
+			DrawLineEx(int(p0.x), int(p0.y), int(p1.x), int(p1.y), 0);
+			DrawLineEx(int(p0.x), int(p0.y), int(p2.x), int(p2.y), 0);
+			DrawLineEx(int(p1.x), int(p1.y), int(p2.x), int(p2.y), 0);
+		}
 	}
-
 }
 
 /*

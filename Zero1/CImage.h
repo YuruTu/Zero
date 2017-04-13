@@ -22,7 +22,7 @@ class CImage
 {
 public:
 	bool CreateImage(CWindow& window);
-	inline void CImage::SetPixel(int x, int y, UINT color)
+	inline void DrawPixel(int x, int y, UINT color)
 	{
 		if (x < 0 || x >= width || y < 0 || y >= height)
 			return;
@@ -47,7 +47,7 @@ public:
 	CWindow *window;
 	UINT *frameBuffer;
 
-	UINT tmpLine;
+	UINT LineMode;
 };
 
 #endif
