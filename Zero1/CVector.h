@@ -90,6 +90,10 @@ public:
 		z += oth.z;
 		w += oth.w;
 	}
+	void operator+=(const float &oth)
+	{
+		x += oth, y += oth, z += oth, w += oth;
+	}
 
 	CVector operator-()
 	{

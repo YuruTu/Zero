@@ -41,7 +41,7 @@ int main()
 		1.0, 500.0f);
 
 	pImage->LineMode = 1;
-	wnd.renderState = RD_STATE_WIREFRAME | RD_STATE_COLOR;
+	wnd.renderState = /*RD_STATE_WIREFRAME |*/ RD_STATE_COLOR;
 
 	while (wnd.Run())
 	{
