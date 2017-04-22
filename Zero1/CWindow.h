@@ -61,9 +61,9 @@ inline void MemSetQuad(void *dest, UINT data, int count)
 {
 	__asm
 	{
-		mov edi, dest;
-		mov ecx, count;
-		mov eax, data;
+		mov edi, dest;   // 目的地
+		mov ecx, count;  // 循环次数
+		mov eax, data;   // 填入内容
 		rep stosd;
 	}
 }

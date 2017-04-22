@@ -9,6 +9,10 @@
 struct CColor
 {
 	float r, g, b;
+	void operator+=(CColor c)
+	{
+		r += c.r, g += c.g, b += c.b;
+	}
 };
 
 class CVertex
@@ -40,11 +44,14 @@ public:
 	CVertex operator/(float n)
 	{
 		CVertex ret;
-		n = 1 / n;
-		ret.v = v* n;
-		ret.color.r = color.r * n;
-		ret.color.g = color.g * n;
-		ret.color.b = color.b * n;
+		if (n != 0.0f)
+		{
+			n = 1 / n;
+			ret.v = v* n;
+			ret.color.r = color.r * n;
+			ret.color.g = color.g * n;
+			ret.color.b = color.b * n;
+		}
 		return ret;
 	}
 

@@ -117,8 +117,6 @@ LRESULT CWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return 0;
 }
 
-
-
 void CWindow::BeginScence(bool clear /*= true*/)
 {
 	if (!clear)
